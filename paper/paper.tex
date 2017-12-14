@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage{todonotes}
+\usepackage{tikz}
+\usepackage{listings}
 
 % Insert liner notes using these commands
 \newcommand{\nlsays}[1]{\todo[color=orange!40]{NL: #1}}
@@ -26,12 +28,50 @@
 \section{Introduction}
 \label{sec:introduction}
 
-\ldots
+\begin{figure}
+  \centering
+  \input{fig-exp}
+  \caption{An exponentiation node in Python (a) translated into the
+    arithmetic theory definition (b) and then x86 assembly
+    implementation (c).}
+  \label{fig:exp}
+\end{figure}
 
-\subsection{Background: Synthesis}
+Writing a compiler is difficult, in part because it requires a
+programmer to implement the core functionality of their source
+language in one or more assembly languages.
+%
+An assembly language is optimized for simple evaluation by a computer
+(simple enough that \emph{hardware} can do it).
+%
+The consequence of this design requirement, illustrated in
+Figure~\ref{fig:exp}, is that non-trivial assembly programs grow
+large, and writing or reasoning about them is tedious and error-prone
+for a human.
+%
+The difference in complexity between the fully-specifying formal
+definition of an operation and its assembly implementation is
+dramatic, suggesting that computer assistance in this implementation
+process would significantly reduce the necessary programming effort of
+a compiler programmer.
+
+\paragraph{Background}
 \label{sec:background}
 
-\ldots
+The field of \emph{program synthesis} aims to automatically perform
+this specification-to-implementation process \ldots
+
+\paragraph{Contributions}
+\label{sec:contributions}
+
+We have defined and implemented an enumerative synthesis procedure
+called \textsc{SomeName} \nlsays{Will should give the tool a name.} for
+operation implementations in a compiler for which a reference
+implementation is available.  Our technique is source-language
+agnostic, using the preexisting reference implementation to produce a
+fixed set of test cases against which x86 programs are sought.  This
+reference-guided partial verification reduces the complexity of the
+technique.
 
 \section{Our Approach}
 \label{sec:approach}

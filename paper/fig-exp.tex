@@ -1,0 +1,15 @@
+\begin{tikzpicture}[node distance=5cm]
+  \node (python) {{\Large \texttt{x ** y}}};
+  \node (a) [above of=python,yshift=-4.2cm] {(a)};
+  \node (theory) [right of=python] {{\LARGE $x^y$}};
+  \node (b) [above of=theory,yshift=-4.2cm] {(b)};
+  \node (x86) [right of=theory] {\lstinputlisting[basicstyle=\small]{exp.txt}};
+  \node (c) [above of=x86,xshift=-2.3cm,yshift=-4cm] {(c)};
+  \node [right of=python,xshift=-2.5cm] {{\LARGE$\rightarrow$}};
+  \node [right of=theory,xshift=-3cm] {{\LARGE$\rightarrow$}};
+\end{tikzpicture}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper"
+%%% End:

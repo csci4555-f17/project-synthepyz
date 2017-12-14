@@ -1,0 +1,10 @@
+  movl x, %ebx
+  movl y, %ecx
+  movl $1, %eax
+loop_begin:
+  cmpl $0, %ebx
+  je loop_end
+  imull %ebx, %eax
+  decl %ecx
+  jmp loop_begin
+loop_end:

@@ -5,3 +5,4 @@
 - [Proposal](proposal/proposal.md)
 - [Status Update](status-update/status-update.md)
 - [Presentation](presentation/presentation.pdf)
+- [Paper](paper/paper.pdf)

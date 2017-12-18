@@ -75,6 +75,13 @@ The three basic components of a SKETCH model are the following: i) the main
 procedure , ii) holes, and iii) assertions.  The synthesizer is only allowed to
 the fill up the holes with appropriate integer and not introduce any new lines. 
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale = 0.6]{workflow.png}
+  \caption{SyGuS procedure \cite{sygus}}
+  \label{sygus_fig}
+\end{figure}
+
 Another interesting idea in program synthesis is that of using enumerative
 learning to come up with the expression. This idea is known by the name of
 Syntax Guided Synthesis also known as \textbf{SyGuS} \cite{sygus}. Now, from a
@@ -93,12 +100,6 @@ synthesis problem it is constrained in the following ways:
 \end{itemize}
 
 The main procedure in syntax guided synthesis is shown in Fig \ref{sygus_fig}.  
-\begin{figure}
-\label{sygus_fig}
-\includegraphics[scale = 0.8]{workflow.png}
-\caption{SyGuS procedure \cite{sygus}}
-\end{figure}
-
 It essentially involves generating expressions and asking a verification oracle
 to check the correctness of the generated expressions. If correct then , we
 have the right function. Else, the oracle comes up with a counter example, and

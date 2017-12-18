@@ -2,6 +2,7 @@
 \usepackage{todonotes}
 \usepackage{tikz}
 \usepackage{listings}
+\usepackage{hyperref}
 
 % Insert liner notes using these commands
 \newcommand{\nlsays}[1]{\todo[color=orange!40]{NL: #1}}
@@ -176,9 +177,9 @@ possible.
 \subsection{Implementation}
 \label{sec:implementation}
 
-We implemented a proof-of-concept of \textsc{SomeName} in Rust \ref{appendix-a}
-\wtsays{what's the best way to inline this, or reference it}.  The
-implementation follows the algorithm given above, but contains some
+We implemented a proof-of-concept of \textsc{SomeName} in
+Rust~\footnote{\url{https://github.com/csci4555-f17/project-synthepyz}}.
+The implementation follows the algorithm given above, but contains some
 optimizations.  Most notably (from a performance standpoint), we compute the
 results of each program incrementally (each Program contains a reference to its
 parent program, its set of registers, and the instruction that makes it unique

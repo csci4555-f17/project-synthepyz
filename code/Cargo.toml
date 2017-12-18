@@ -1,0 +1,8 @@
+[package]
+name = "vasm-sim"
+version = "0.1.0"
+authors = ["wtemple"]
+
+[dependencies]
+rayon = "0.9"
+typed-arena = "1.3"

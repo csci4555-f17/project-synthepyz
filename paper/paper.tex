@@ -1,8 +1,11 @@
 \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
 \usepackage{todonotes}
 \usepackage{tikz}
 \usepackage{listings}
 \usepackage{hyperref}
+\usepackage{syntax}
 
 % Insert liner notes using these commands
 \newcommand{\nlsays}[1]{\todo[color=orange!40]{NL: #1}}
@@ -23,9 +26,6 @@
 
 \nlsays{Just my first idea for the title; suggest your own}
 
-\nlsays{Authors are alphabetical; we can rearrange by significance or
-  whatever if desired}
-
 \section{Introduction}
 \label{sec:introduction}
 
@@ -38,23 +38,21 @@
   \label{fig:exp}
 \end{figure}
 
-Writing a compiler is difficult, in part because it requires a
-programmer to implement the core functionality of their source
-language in one or more assembly languages.
-%
-An assembly language is optimized for simple evaluation by a computer
-(simple enough that \emph{hardware} can do it).
-%
+Writing a compiler is difficult, in part because it requires a programmer to
+implement the core functionality of their source language in one or more
+assembly languages.
+
+An assembly language is optimized for simple evaluation by a computer (simple
+enough that \emph{hardware} can do it).
+
 The consequence of this design requirement, illustrated in
-Figure~\ref{fig:exp}, is that non-trivial assembly programs grow
-large, and writing or reasoning about them is tedious and error-prone
-for a human.
-%
-The difference in complexity between the fully-specifying formal
-definition of an operation and its assembly implementation is
-dramatic, suggesting that computer assistance in this implementation
-process would significantly reduce the necessary programming effort of
-a compiler programmer.
+Figure~\ref{fig:exp}, is that non-trivial assembly programs grow large, and
+writing or reasoning about them is tedious and error-prone for a human.
+
+The difference in complexity between the fully-specifying formal definition of
+an operation and its assembly implementation is dramatic, suggesting that
+computer assistance in this implementation process would significantly reduce
+the necessary programming effort of a compiler programmer.
 
 \section{Background}
 \label{sec:background}
@@ -140,18 +138,7 @@ vx86 machine has the following properties:
 
 By limiting x86 in this way, we define a language which allows us to
 recursively enumerate all possible programs and consider their behaviors
-incrementally.
-
-\subsection{Synthesis}
-
-\wtsays{This is where I've gotten to so far, wanted to post this before
-continuing to work.}
-
-\subsubsection{Generation}
-
-\subsubsection{Validation}
-
-\subsubsection{Pruning}
+incrementally. Formally, a vx86 program has the following grammar:
 
 \subsection{Generating Tests}
 
@@ -166,14 +153,92 @@ Given a $k$-ary operator, we will choose tests based on
     \item all combinations of the numbers one and zero (based the fact that
 	these are the multiplicative and additive identities, respectively),
 	and
-    \item a sample of values chosen by the result $f(x)=x^{9}$ for random
-	values of $x$, up to a certain threshold
+    \item a sample of sequences of $k$ values chosen by the result $f(x)=x^{9}$
+	for random values of $x$, up to a certain threshold
 \end{itemize}
 
 Because the synthesis engine is slow, it is desirable to generate a suite of
 test cases that covers both the boundary cases around zero and one as well as
 a probabilistic subset of the larger space of integers in as few tests as
 possible.
+
+\begin{grammar}
+
+<program> ::= <instruction> <program>
+\alt <empty>
+
+<instruction> ::= `mov' <register> <register>
+\alt `add' <register> <register>
+\alt `mul' <register> <register>
+\alt `neg' <register>
+
+<register> ::= `r' <natural-number>
+
+\end{grammar}
+
+\subsection{Synthesis}
+
+Our synthesis algorithm is fully enumerative.  That is, it begins with an empty
+program and considers every program that exists by enumerating all valid
+derivations of new programs from existing programs.
+
+We will say a program is a pair $(C,R)$, where $C$ is a sequence of
+instructions following the grammar given above, and $R$ is a set of virtual
+registers in use within $C$.  For synthesis of an arbitrary operator with $k$
+operands (i.e. a $k$-ary operator), we will initialize our synthesis engine
+with a set of candidate programs $P = {(\epsilon, \{r_{0}, r_{1}, r_{2} \ldots
+r_{k-1}}\})$, containing only the null program with zero instructions and as
+many virtual registers as our operator has inputs. We further initialize a set
+$V = \{\}$, which is to store the set of program outputs we have seen, to be
+empty.
+
+\subsubsection{Validation}
+
+During the validation step, we \textit{execute} each program $c \in P$ by
+assigning the inputs of each test case to the first $k$ virtual registers and
+simulating the result of executing each instruction in $c$, producing a
+\textbf{signature}.  The signature of a program is the set of all register
+assignments resulting from the execution of the program on each test.  If the
+signature $S$ is in $V$, the set of visited program outputs, then we remove $c$
+from $P$, as it is functionally equivalent to a program we have already
+considered.  If $S$ is not in $V$, then $c$ will either be validated or
+extended.
+
+If the signature under consideration, $S$, contains any register which is
+\textit{always} assigned to the result of its test case, then we say that $c$
+satisfies the specification, and we accept $c$ as the correct solution and the
+result of the synthesis problem.  If $c$ does not satisfy the specification,
+then we add $S$ to $V$.
+
+Once we have considered each program in $P$, and if no program was admitted as
+the correct result, replace $P$ with $P'$ and continue to the next step,
+program derivation.
+
+\subsubsection{Derivation}
+
+We begin derivation by constructing a set of next-generation programs $P' =
+\{\}$ to be empty.  We then consider again, each program $c$ in $P$, and we
+produce derivations of $c$ by considering modifications of $c$ according to the
+following rules:
+
+\begin{itemize}
+    \item \textbf{Aliasing} one register to another, by adding a new virtual
+	register $r_{j}$ to $c$, and inserting the instruction \texttt{mov
+	$r_{i}$ $r_{j}$} to copies of $c$ for each virtual register $r_{i}$
+	already in $c$.
+    \item \textbf{Operating} over registers already in $c$, by considering all
+	instructions other than \texttt{mov} and all combinations of registers
+	in $c$ as operands. In other words, try every combination of registers
+	with every possible instruction.
+\end{itemize}
+
+Every candidate derivation produced by the rules above will be added to $P'$.
+Then, once we have considered all derivations of all programs and added them to
+$P'$, we replace $P$ with $P'$ and return to the Validation step, repeating
+this process until a correct program is found.
+
+\section{Implementation & Evaluation}
+\label{sec:evaluation}
 
 \subsection{Implementation}
 \label{sec:implementation}
@@ -187,10 +252,10 @@ parent program, its set of registers, and the instruction that makes it unique
 from its parent), where each program is simulated only as an incremental change
 from the results of the program that generated it.
 
-\section{Evaluation}
-\label{sec:evaluation}
+\subsection{Example}
 
-\ldots \wtsays{Still working on this section, more to come.}
+Consider the expression $x^{2} + y$.
+\wtsays{Up to this point, I'm working on some examples.}
 
 \section{Conclusion}
 \label{sec:conclusion}
